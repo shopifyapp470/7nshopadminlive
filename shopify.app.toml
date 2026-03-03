@@ -7,7 +7,6 @@ embedded = true
 
 [build]
 automatically_update_urls_on_dev = true
-include_config_on_deploy = true
 
 [webhooks]
 api_version = "2026-04"
@@ -40,7 +39,7 @@ redirect_urls = [
 ]
  
 [app_proxy]
-url = "https://sevennshopadminlive-uq5r.onrender.com/custom-proxy"
+url = "https://sevennshopadminlive-uq5r.onrender.com/app/custom-proxy"
 subpath = "public"
 prefix = "apps"
 
