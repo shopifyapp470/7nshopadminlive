@@ -76,7 +76,7 @@ export default function DigitalHubResponse() {
     <Frame>
       <div style={{ backgroundColor: "var(--p-color-bg-surface-secondary)", minHeight: "100vh" }}>
         <Page 
-          title="Download History1234" 
+          title="Download History1234567890" 
           subtitle="Real-time tracking of asset downloads"
           fullWidth
           primaryAction={
