@@ -3,8 +3,14 @@ export async function syncRewardTemplate(admin, session) {
 
   const APP_HANDLE = "7nshop-admin-app"; 
   const BLOCK_FILENAME = "app-block";
-  const BLOCK_UUID = "019ae995-5b96-7b90-8edb-844a2bbcc358";
- 
+  //const BLOCK_UUID = "019ae995-5b96-7b90-8edb-844a2bbcc358";
+  const BLOCK_UUID = "0a018d28-0a0e-263a-5d9d-c06fbd32a278";
+
+
+
+
+
+
   const BLOCK_TYPE = `shopify://apps/${APP_HANDLE}/blocks/${BLOCK_FILENAME}/${BLOCK_UUID}`;
   const templateSuffix = "reward-redeem";
   const templateKey = `templates/page.${templateSuffix}.json`;
