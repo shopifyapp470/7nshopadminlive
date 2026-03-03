@@ -1,0 +1,567 @@
+{{ 'digital-hub-style.css' | asset_url | stylesheet_tag }}
+
+<div class="digital-hub-main">
+  <aside class="sidebar-nav">
+    <button class="sidebar-close" onclick="toggleSidebar()" aria-label="Close Menu">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <line x1="18" y1="6" x2="6" y2="18"></line>
+            <line x1="6" y1="6" x2="18" y2="18"></line>
+        </svg>
+    </button>
+    <div class="brand-logo">{{ block.settings.hub_title | default: "7nshop Digital Hub" }}</div>
+    <nav class="nav-container">
+      <ul class="nav-list">
+        <li class="nav-item">
+          <a href="javascript:void(0)" class="nav-link active" id="homeLink" onclick="showSection('assets', this)">Home (Overview)</a>
+        </li>
+
+        <li class="nav-item">
+          <button class="nav-link dropdown-toggle" onclick="toggleMenu('contentHubMenu', 'supportMenu', this)">
+           
+            {{ block.settings.content_title | default: "Content Hub" }}
+            <span class="main-arrow-svg">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg>
+            </span>
+          </button>
+          <ul id="contentHubMenu" class="dropdown-menu show">
+            <li class="filter-group-label clickable" onclick="toggleFilterSubMenu('brand-checkboxes', this)">
+                    Brands 
+            <span class="arrow-icon">
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"></polyline></svg>
+            </span>
+            </li>
+            <div id="brand-checkboxes" class="checkbox-area sub-hide"></div>
+            <li class="filter-group-label clickable" onclick="toggleFilterSubMenu('tag-checkboxes', this)">
+                    Tags
+            <span class="arrow-icon">
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"></polyline></svg>
+            </span>
+            </li>
+            <div id="tag-checkboxes" class="checkbox-area sub-hide"></div>
+          </ul>
+        </li>
+
+        <li class="nav-item">
+          <button class="nav-link dropdown-toggle" onclick="toggleMenu('supportMenu', 'contentHubMenu', this)">
+             {{ block.settings.help_support | default: "Help & Support" }}
+            <span class="main-arrow-svg">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg>
+            </span>
+          </button>
+          <ul id="supportMenu" class="dropdown-menu">
+            <li class="nav-item">
+                <a href="javascript:void(0)" class="nav-link sub-link" id="faqBtn" onclick="showSection('faq', this)">FAQ</a>
+            </li>
+            <li class="filter-group-label faq-filters hide clickable" onclick="toggleFilterSubMenu('faq-brand-checkboxes', this)">
+              FAQ Categories
+                <span class="arrow-icon">
+                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"></polyline></svg>
+                </span>
+            </li>
+            <div id="faq-brand-checkboxes" class="checkbox-area faq-filters hide sub-hide"></div>
+            <li class="filter-group-label faq-filters hide clickable" onclick="toggleFilterSubMenu('faq-tag-checkboxes', this)">
+              FAQ Tags
+            <span class="arrow-icon">
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"></polyline></svg>
+            </span>
+            </li>
+            <div id="faq-tag-checkboxes" class="checkbox-area faq-filters hide sub-hide"></div>
+          </ul>
+        </li>
+        
+        <li class="nav-item">
+          <button class="nav-link dropdown-toggle" onclick="toggleMenu('surveyMenu', ['contentHubMenu', 'supportMenu'], this)">
+            {{ block.settings.customer_survey | default: "Customer Survey" }}
+            <span class="main-arrow-svg">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg>
+            </span>
+          </button>
+          <ul id="surveyMenu" class="dropdown-menu">
+            <li><a href="javascript:void(0)" class="nav-link sub-link" onclick="showSection('survey-link', this)">Survey Link</a></li>
+            <li><a href="javascript:void(0)" class="nav-link sub-link" onclick="showSection('active-survey', this)">Active Survey</a></li>
+            <li><a href="javascript:void(0)" class="nav-link sub-link" onclick="showSection('completed-survey', this)">Completed Survey</a></li>
+          </ul>
+        </li>
+      </ul>
+    </nav>
+  </aside>
+
+  <main class="content-area">
+    <header class="hub-header">
+      <div class="header-left">
+        <button class="menu-toggle" onclick="toggleSidebar()" aria-label="Open Menu">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <line x1="3" y1="12" x2="21" y2="12"></line>
+                <line x1="3" y1="6" x2="21" y2="6"></line>
+                <line x1="3" y1="18" x2="21" y2="18"></line>
+            </svg>
+        </button>
+         <div class="title-group">
+           <h2 class="title-purple" id="mainTitle">Digital Assets</h2>
+           <p class="user-email">User: <strong>{{ customer.email }}</strong></p>
+         </div>
+      </div>
+      <div class="header-right">
+        <input type="text" id="linkSearch" class="search-input" placeholder="Search..." onkeyup="applyMultiFilter()">
+      </div>
+    </header>
+
+    <div class="links-container" id="linksList">
+        <p id="loading-msg" style="text-align:center; padding:50px;">Fetching resources...</p>
+    </div>
+
+    <div id="pagination" class="pagination-container" style="display:none;">
+      <button id="prevBtn" class="page-btn" onclick="changePage(-1)">Previous</button>
+      <span id="pageInfo">Page 1</span>
+      <button id="nextBtn" class="page-btn" onclick="changePage(1)">Next</button>
+    </div>
+  </main>
+</div>
+<script>
+document.addEventListener('click', function(event) {
+    const sidebar = document.querySelector('.sidebar-nav');
+    const toggleBtn = document.querySelector('.menu-toggle');
+    if (window.innerWidth <= 768 && sidebar.classList.contains('active')) {
+        if (!sidebar.contains(event.target) && !toggleBtn.contains(event.target)) {
+            sidebar.classList.remove('active');
+        }
+    }
+});
+function toggleSidebar() {
+    const sidebar = document.querySelector('.sidebar-nav');
+    sidebar.classList.toggle('active');
+}
+function toggleFilterSubMenu(id, el) {
+    const content = document.getElementById(id);
+    if (content.classList.contains('sub-hide')) {
+        content.classList.remove('sub-hide');
+        el.classList.add('active-header'); 
+    } else {
+        content.classList.add('sub-hide');
+        el.classList.remove('active-header');
+    }
+}
+
+document.addEventListener('click', function(event) {
+    const sidebar = document.querySelector('.sidebar-nav');
+    const toggleBtn = document.querySelector('.menu-toggle');
+    if (window.innerWidth <= 768 && sidebar.classList.contains('active')) {
+        if (!sidebar.contains(event.target) && !toggleBtn.contains(event.target)) {
+            sidebar.classList.remove('active');
+        }
+    }
+});
+</script>
+<script>
+  window.currentCustomerEmail = "{{ customer.email | default: '' }}";
+</script>
+<script>
+let allAssets = [];
+let allFaqs = []; 
+let filteredData = [];
+let currentPage = 1;
+const perPage = 10;
+let currentView = 'assets'; 
+const userEmail = "{{ customer.email }}"; 
+
+async function fetchData() {
+    const types = ['digital_hub', 'faq', 'surveys'];
+    try {
+        const results = await Promise.all(
+            types.map(type => fetch(`/apps/public?type=${type}`).then(res => res.json()))
+        );
+        results.forEach((result, index) => {
+            const currentType = types[index];
+            if (result.success) {
+                switch (currentType) {
+                    case 'digital_hub':
+                        allAssets = result.links || [];
+                        buildSidebarFilters(allAssets, 'brand-checkboxes', 'tag-checkboxes', 'brand-filter', 'tag-filter');
+                        break;
+
+                    case 'faq':
+                        allFaqs = result.links || [];
+                        buildSidebarFilters(allFaqs, 'faq-brand-checkboxes', 'faq-tag-checkboxes', 'faq-brand-filter', 'faq-tag-filter');
+                        break;
+
+                    case 'surveys':
+                        allSurveys = result.surveys || [];
+                        break;
+                        
+                    default:
+                        console.warn("Unknown type:", currentType);
+                }
+            }
+        });
+        applyMultiFilter();
+    } catch (e) {
+        console.error("Fetch data error:", e);
+        const loadingMsg = document.getElementById('loading-msg');
+        if (loadingMsg) loadingMsg.innerText = "Data load failed. Please refresh the page.";
+    }
+}
+
+function buildSidebarFilters(links, brandId, tagId, brandClass, tagClass) {
+    const brandContainer = document.getElementById(brandId);
+    if(brandContainer) {
+        const categories = [...new Set(links.map(l => l.category).filter(c => c))];
+        brandContainer.innerHTML = categories.map(cat => `
+            <li><label class="filter-checkbox-label">
+                <input type="checkbox" class="${brandClass}" value="${cat.toLowerCase()}" onchange="applyMultiFilter()">
+                <span class="custom-check"></span> ${cat}
+            </label></li>`).join('');
+    }
+    if(tagId) {
+        const tagContainer = document.getElementById(tagId);
+        let tagsArr = [];
+        links.forEach(item => { if (item.tag) item.tag.split(',').forEach(t => tagsArr.push(t.trim().toLowerCase())); });
+        const uniqueTags = [...new Set(tagsArr.filter(t => t))];
+        tagContainer.innerHTML = uniqueTags.map(tag => `
+            <li><label class="filter-checkbox-label">
+                <input type="checkbox" class="${tagClass}" value="${tag}" onchange="applyMultiFilter()">
+                <span class="custom-check"></span> ${tag}
+            </label></li>`).join('');
+    }
+}
+
+function showSection(section, el) {
+    if (!el) {
+        console.error(`Navigation element not found for section: ${section}`);
+        return;
+    }
+    currentView = section;
+    const navLinks = document.querySelectorAll('.nav-link');
+    navLinks.forEach(link => link.classList.remove('active'));
+    el.classList.add('active');
+
+    const TITLE_MAP = {
+        'faq': "Frequently Asked Questions",
+        'assets': "Digital Assets",
+        'survey-link': "Customer Survey Links",
+        'active-survey': "Your Active Surveys",
+        'completed-survey': "Completed Surveys History",
+        'default': "Digital Hub"
+    };
+
+    const mainTitleEl = document.getElementById('mainTitle');
+    if (mainTitleEl) {
+        mainTitleEl.innerText = TITLE_MAP[section] || TITLE_MAP['default'];
+    }
+    const faqFilters = document.querySelectorAll('.faq-filters');
+    const isFaq = section === 'faq';
+    faqFilters.forEach(filter => {
+        filter.classList.toggle('hide', !isFaq);
+    });
+    try {
+        if (section.includes('survey')) {
+            if (typeof renderSurveyUI === 'function') {
+                renderSurveyUI(section);
+            }
+        } else {
+            if (typeof applyMultiFilter === 'function') {
+                applyMultiFilter();
+            }
+        }
+    } catch (error) {
+        console.error(`Error switching to section ${section}:`, error);
+    }
+}
+/*** rendersurveryui ***/
+function renderSurveyUI(view) {
+    const list = document.getElementById('linksList');
+    if (!list) return; 
+
+    const customerEmail = window.currentCustomerEmail || "";
+    const dataToRender = allSurveys.filter(survey => {
+        if (view === 'active-survey' || view === 'survey-link') {
+            return survey.status === 'ACTIVE';
+        }
+        if (view === 'completed-survey') {
+            return survey.status === 'DEACTIVE';
+        }
+        return false;
+    });
+
+    if (dataToRender.length === 0) {
+        list.innerHTML = `
+            <div class="no-data-msg">
+                <p>No surveys found for this section.</p>
+            </div>`;
+        return;
+    }
+
+    list.innerHTML = dataToRender.map((survey) => {
+        const title = survey.title || "Untitled Survey";
+        let baseLink = survey.link || "";
+
+        if (baseLink && !/^https?:\/\//i.test(baseLink)) {
+            baseLink = `https://${baseLink}`;
+        }
+
+        let finalUrl = baseLink;
+        if (customerEmail && baseLink) {
+            try {
+                const urlObj = new URL(baseLink);
+                urlObj.searchParams.set('utm_source', customerEmail);
+                urlObj.searchParams.set('survey_title', title);
+                finalUrl = urlObj.toString();
+            } catch (e) {
+                const separator = baseLink.includes('?') ? '&' : '?';
+                finalUrl = `${baseLink}${separator}utm_source=${encodeURIComponent(customerEmail)}&survey_title=${encodeURIComponent(title)}`;
+            }
+        }
+
+        const isCompleted = survey.status === 'DEACTIVE';
+        const isSurveyLinkTab = (view === 'survey-link');
+
+        return `
+            <div class="survey-card">
+                <div class="survey-container">
+                    <div class="survey-info">
+                        <div class="survey-title-row">
+                            <h3 class="survey-title">${escapeHTML(title)}</h3>
+                            <span class="status-badge ${isCompleted ? 'status-completed' : 'status-active'}">
+                                ${isCompleted ? 'COMPLETED' : 'ACTIVE'}
+                            </span>
+                        </div>
+                        <p class="survey-desc">Status details recorded in your history.</p>
+                    </div>
+
+                    ${isSurveyLinkTab ? `
+                    <div class="survey-url-box">
+                        <input type="text" value="${finalUrl}" readonly class="survey-input-readonly">
+                        <button class="btn-copy" onclick="copyToClipboard('${finalUrl}', this)">Copy</button>
+                    </div>
+                    ` : ''}
+                </div>
+            </div>
+        `;
+    }).join('');
+}
+
+function escapeHTML(str) {
+    const p = document.createElement('p');
+    p.textContent = str;
+    return p.innerHTML;
+}
+/*** end ***/
+
+function toggleMenu(openId, closeIds, btn) {
+    const openMenu = document.getElementById(openId);
+    document.querySelectorAll('.dropdown-toggle').forEach(el => {
+        if (el !== btn) el.classList.remove('active');
+    });
+    if (Array.isArray(closeIds)) {
+        closeIds.forEach(id => document.getElementById(id).classList.remove('show'));
+    } else {
+        document.getElementById(closeIds).classList.remove('show');
+    }
+    const isOpening = openMenu.classList.toggle('show');
+    if (isOpening) {
+        btn.classList.add('active');
+    } else {
+        btn.classList.remove('active');
+    }
+    if(openId === 'contentHubMenu') showSection('assets', document.getElementById('homeLink'));
+    else if(openId === 'supportMenu') showSection('faq', document.getElementById('faqBtn'));
+    else if(openId === 'surveyMenu') {
+        const firstSurveyLink = btn.nextElementSibling.querySelector('a');
+        if(firstSurveyLink) showSection('survey-link', firstSurveyLink);
+    }
+}
+
+function applyMultiFilter() {
+    const searchVal = document.getElementById('linkSearch').value.toLowerCase().trim();
+    const dataToFilter = currentView === 'faq' ? allFaqs : allAssets;
+    const brandSelector = currentView === 'faq' ? '.faq-brand-filter:checked' : '.brand-filter:checked';
+    const tagSelector = currentView === 'faq' ? '.faq-tag-filter:checked' : '.tag-filter:checked';
+
+    const checkedBrands = Array.from(document.querySelectorAll(brandSelector)).map(c => c.value);
+    const checkedTags = Array.from(document.querySelectorAll(tagSelector)).map(c => c.value);
+
+    filteredData = dataToFilter.filter(item => {
+        const title = (item.name || item.question || "").toLowerCase();
+        const desc = (item.description || item.answer || "").toLowerCase();
+        const cat = (item.category || "").toLowerCase();
+        const matchesSearch = (title + desc + cat).includes(searchVal);
+        const matchesBrand = checkedBrands.length === 0 || checkedBrands.includes(cat);
+        const itemTags = (item.tag || "").toLowerCase().split(',').map(t => t.trim());
+        const matchesTag = checkedTags.length === 0 || checkedTags.some(t => itemTags.includes(t));
+        return matchesSearch && matchesBrand && matchesTag;
+    });
+    currentPage = 1;
+    renderUI();
+}
+function toggleAccordion(el) {
+    const parent = el.parentElement;
+    const content = parent.querySelector('.faq-content');
+    const icon = el.querySelector('.faq-icon');
+
+    document.querySelectorAll('.faq-content').forEach(otherContent => {
+        if (otherContent !== content) {
+            otherContent.style.maxHeight = null;
+            otherContent.parentElement.classList.remove('active-item');
+            const otherIcon = otherContent.parentElement.querySelector('.faq-icon');
+            if (otherIcon) otherIcon.style.transform = 'rotate(0deg)';
+        }
+    });
+
+    const isOpen = content.style.maxHeight && content.style.maxHeight !== "0px";
+
+    if (isOpen) {
+        content.style.maxHeight = "0px";
+        parent.classList.remove('active-item');
+        if (icon) icon.style.transform = 'rotate(0deg)';
+    } else {
+        content.style.maxHeight = content.scrollHeight + "px";
+        parent.classList.add('active-item');
+        if (icon) icon.style.transform = 'rotate(180deg)';
+    }
+}
+
+function renderUI() {
+    const list = document.getElementById('linksList');
+    const start = (currentPage - 1) * perPage;
+    const items = filteredData.slice(start, start + perPage);
+    const CHEVRON_ICON = `
+    <svg class="faq-icon" width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <path d="M5 7.5L10 12.5L15 7.5" stroke="currentColor" stroke-width="1.67" stroke-linecap="round" stroke-linejoin="round"/>
+    </svg>`;
+
+    if (items.length === 0) {
+        list.innerHTML = `<div style='text-align:center; padding:50px;'>No items found.</div>`;
+        document.getElementById('pagination').style.display = 'none';
+        return;
+    }
+
+    list.innerHTML = items.map((item, i) => {
+        const title = item.name || item.question || "Untitled";
+        const body = item.description || item.answer || "No details available.";
+        
+        if (currentView === 'faq') {
+            return `
+            <div class="faq-accordion">
+              <div class="faq-header" onclick="toggleAccordion(this)">
+                <h3 class="faq-question">${title}</h3>
+               <div class="faq-icon-container">${CHEVRON_ICON}</div>
+              </div>
+              <div class="faq-content">
+                <div class="faq-answer-inner" >
+                  ${body}
+                </div>
+              </div>
+            </div>`;
+        }
+
+        const shop = window.location.hostname;
+        const originalUrl = item.url || '#';
+        let finalTrackingUrl = "";
+
+        const isExternal = originalUrl.startsWith('http') && !originalUrl.includes(shop);
+            if (isExternal) {
+            const params = new URLSearchParams({
+            type: 'redirect',
+            to: originalUrl,
+            utm_source: userEmail || 'guest',
+            title: title,
+            shop: shop
+        });
+        finalTrackingUrl = `${window.location.origin}/apps/public/digital-hub-view?${params.toString()}`;
+    } else {
+        const separator = originalUrl.includes('?') ? '&' : '?';
+        finalTrackingUrl = `${originalUrl}${separator}utm_source=${encodeURIComponent(userEmail)}&title=${encodeURIComponent(title)}`;
+    }
+        const canDownload = item.download === true && item.downloadUrl;
+
+        return `
+        <div class="link-item-card">
+          <div class="card-body">
+            <h3 class="asset-title">${title}</h3>
+            <p class="asset-desc">${body}</p>
+          </div>
+          <div class="card-right-side">
+            <div class="button-group">
+              <button class="action-tab" onclick="handleAction(this, 'share-${i}')">Share</button>
+              <button class="action-tab" onclick="handleAction(this, 'qr-${i}')">QR</button>
+              ${canDownload ? `<button class="action-tab" onclick="handleAction(this, 'dl-${i}')">Download</button>` : ''}
+            </div>
+            
+            <div id="share-${i}" class="info-panel hide">
+              <input type="text" value="${finalTrackingUrl}" readonly class="link-input" >
+              <button onclick="copyToClipboard('${finalTrackingUrl}', this)" class="main-btn">Copy</button>
+            </div>
+            
+            <div id="qr-${i}" class="info-panel hide">
+              <img src="https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=${encodeURIComponent(finalTrackingUrl)}" >
+              <p>Scan to visit & track</p>
+            </div>
+            
+            <div id="dl-${i}" class="info-panel hide">
+              <button onclick="downloadFile('${item.downloadUrl}', '${title}', '${item._id || item.id}')" class="main-btn">Download Now</button>
+            </div>
+          </div>
+        </div>`;
+    }).join('');
+    updatePagination();
+}
+
+async function downloadFile(url, filename, assetId) {
+    fetch('/apps/public/download-check', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ employeeEmail: userEmail, assetId: assetId, assetName: filename, action: 'download' })
+    }).catch(err => console.error("Tracking failed:", err));
+
+    try {
+        const response = await fetch(url);
+        const blob = await response.blob();
+        const bUrl = window.URL.createObjectURL(blob);
+        const link = document.createElement('a');
+        link.href = bUrl;
+        link.download = filename;
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        window.URL.revokeObjectURL(bUrl);
+    } catch (e) { window.open(url, '_blank'); }
+}
+
+function handleAction(btn, id) {
+    const parent = btn.closest('.card-right-side');
+    const panel = parent.querySelector('#' + id);
+    const isOpen = !panel.classList.contains('hide');
+    parent.querySelectorAll('.info-panel').forEach(p => p.classList.add('hide'));
+    parent.querySelectorAll('.action-tab').forEach(b => b.classList.remove('active'));
+    if (!isOpen) { panel.classList.remove('hide'); btn.classList.add('active'); }
+}
+
+function copyToClipboard(text, btn) {
+    navigator.clipboard.writeText(text).then(() => {
+        const old = btn.innerText; btn.innerText = "Copied!";
+        setTimeout(() => { btn.innerText = old; }, 2000);
+    });
+}
+
+function updatePagination() {
+    const totalPages = Math.ceil(filteredData.length / perPage);
+    document.getElementById('pagination').style.display = filteredData.length > perPage ? 'flex' : 'none';
+    document.getElementById('pageInfo').innerText = `Page ${currentPage} of ${totalPages || 1}`;
+    document.getElementById('prevBtn').disabled = currentPage === 1;
+    document.getElementById('nextBtn').disabled = currentPage >= totalPages;
+}
+function changePage(dir) { currentPage += dir; renderUI(); window.scrollTo({ top: 0, behavior: 'smooth' }); }
+document.addEventListener('DOMContentLoaded', fetchData);
+</script>
+
+{% schema %}
+{
+  "name": "Digital Hub Assets",
+  "target": "section",
+  "settings": [
+    { "type": "text", "id": "hub_title", "label": "Hub Title", "default": "7nshop Digital Hub" },
+    { "type": "text", "id": "content_title", "label": "Content Title", "default": "Content Hub" },
+    { "type": "text", "id": "help_support", "label": "Help Support Title", "default": "Help & Support" },
+    { "type": "text", "id": "customer_survey", "label": "Customer Survey Title", "default": "Customer Survey" }
+  ]
+}
+{% endschema %}

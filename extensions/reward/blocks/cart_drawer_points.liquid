@@ -1,0 +1,257 @@
+<div id="loyalty-extension-wrapper" style="display: none;">
+  <section class="app-proxy-section" style="padding: 10px 15px;">
+    <div style="border: 2px solid #3498db; border-radius: 4px; overflow: hidden; background: #fff; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;">
+      
+      <div style="background-color: #e8fbf3; padding: 12px; display: flex; align-items: center; border-bottom: 1px solid #eee;">
+        <div style="width: 18px; height: 18px; border: 1.5px solid #444; border-radius: 3px; margin-right: 10px; display: flex; align-items: center; justify-content: center;">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#444" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
+        </div>
+        <span style="font-size: 14px; font-weight: 600; color: #333;">Redeem Reward Points</span>
+      </div>
+
+      <div class="proxy-app-container" style="padding: 15px;" 
+           data-customer-id="{{ customer.id }}" 
+           data-customer-name="{{ customer.name }}">
+        
+        {% if customer %}
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
+            <div style="font-size: 20px; font-weight: 700; color: #2d3436;">
+              Balance <span style="font-size: 12px; font-weight: 400; color: #636e72; margin-left: 4px;">(Reward Points)</span>
+            </div>
+            <div style="display: flex; align-items: center; gap: 8px;">
+              <span class="points_balance_display" style="font-size: 22px; font-weight: 700; color: #2d3436;">0</span>
+            </div>
+          </div>
+
+          <div class="redeem_action_area" style="display: block;">
+            <div style="display: flex; gap: 10px;">
+              <div style="position: relative; flex: 1;">
+                <input type="number" class="user_input_value" 
+                       style="width: 100%; padding: 10px; border: 1px solid #dfe6e9; border-radius: 6px; font-size: 16px; font-weight: 700; color: #2d3436; outline: none;"
+                       placeholder="0">
+                <span style="position: absolute; right: 12px; top: 50%; transform: translateY(-50%); color: #b2bec3; font-size: 13px;">Points</span>
+              </div>
+              <button type="button" class="btn_submit_redeem"
+                      style="background-color: {{ block.settings.button_bg_color | default: '#d63384' }}; color: {{ block.settings.button_text_color | default: '#ffffff' }}; padding: 0 20px; border: none; border-radius: 6px; font-weight: 700; cursor: pointer;">
+                Redeem
+              </button>
+            </div>
+            <div class="input_validation_error" style="color: #e74c3c; font-size: 12px; margin-top: 5px; display: none;"></div>
+          </div>
+
+          <div class="api_loading" style="display:none; margin-top:15px; text-align:center; font-size: 14px; color: #636e72; font-weight: 600;">
+            <span style="display:inline-block; animation: spin 1s linear infinite;">↻</span> Processing...
+          </div>
+
+          <div class="active_reward_display" style="display: none; margin-top: 10px;">
+             <div style="background: #d1e7dd; border: 1px solid #badbcc; color: #0f5132; border-radius: 6px; padding: 12px; text-align: center;">
+                <span style="font-weight: 700; font-size: 14px;">✔ Discount Applied Successfully</span>
+             </div>
+          </div>
+        {% else %}
+          <div style="text-align: center; padding: 10px;">
+            <p style="font-size: 14px; color: #636e72;">Login to view points.</p>
+            <a href="{{ routes.account_login_url }}" style="color: #3498db; text-decoration: none; font-weight: 600;">Login Now →</a>
+          </div>
+        {% endif %}
+      </div>
+    </div>
+  </section>
+</div>
+
+<style> @keyframes spin { 100% { transform: rotate(360deg); } } </style>
+
+<script>
+let isRedeeming = false;
+
+document.addEventListener("DOMContentLoaded", function() {
+  initExtension();
+});
+
+function initExtension() {
+  const source = document.getElementById('loyalty-extension-wrapper');
+  
+  const injectApp = () => {
+    fetch('/cart.js')
+      .then(res => res.json())
+      .then(cart => {
+        const hasItems = cart.item_count > 0;
+        const scopes = [
+          { selector: '.page__header--desktop', idSuffix: 'desktop' },
+          { selector: '.page__header--mobile', idSuffix: 'mobile' }
+        ];
+
+        scopes.forEach(scope => {
+          const headerContainer = document.querySelector(scope.selector);
+          if (!headerContainer) return;
+          let appContainer = headerContainer.querySelector('.injected-loyalty-app');
+          if (!hasItems) {
+            if (appContainer) appContainer.style.display = 'none';
+            return;
+          }
+
+          if (appContainer) {
+            appContainer.style.display = 'block';
+            checkCartState(appContainer, cart);
+            return;
+          }
+
+          const entries = headerContainer.querySelectorAll('.minicart__entry');
+          let targetLocation = null;
+          let position = 'afterend';
+
+          if (entries.length > 0) {
+            targetLocation = entries[entries.length - 1];
+          } else {
+            targetLocation = headerContainer.querySelector('.minicart__list') || 
+                             headerContainer.querySelector('.cart_items') || 
+                             headerContainer.querySelector('.minicart__entries');
+            position = 'beforeend'; 
+          }
+
+          if (targetLocation && source) {
+            const newAppContainer = document.createElement('div');
+            newAppContainer.className = 'injected-loyalty-app';
+            newAppContainer.innerHTML = source.innerHTML; 
+            
+            if (position === 'afterend') {
+              targetLocation.insertAdjacentElement('afterend', newAppContainer);
+            } else {
+              targetLocation.appendChild(newAppContainer);
+            }
+            setupInstance(newAppContainer);
+          }
+        });
+      });
+  };
+
+  function setupInstance(wrapper) {
+    fetchCustomerPoints(wrapper);
+    const submitBtn = wrapper.querySelector('.btn_submit_redeem');
+    if(submitBtn) {
+      submitBtn.onclick = () => submitCustomerData(wrapper);
+    }
+    fetch('/cart.js').then(res => res.json()).then(cart => checkCartState(wrapper, cart));
+  }
+
+  injectApp();
+  
+  const observer = new MutationObserver(() => { 
+    injectApp(); 
+  });
+  observer.observe(document.body, { childList: true, subtree: true });
+}
+
+function submitCustomerData(wrapper) {
+  const inputField = wrapper.querySelector('.user_input_value');
+  const loadingDiv = wrapper.querySelector('.api_loading');
+  const actionArea = wrapper.querySelector('.redeem_action_area');
+  const customerId = wrapper.querySelector('.proxy-app-container').getAttribute('data-customer-id');
+
+  if (!inputField.value || inputField.value <= 0) return alert("Please enter points.");
+  if (isRedeeming) return;
+
+  isRedeeming = true;
+  actionArea.style.display = 'none';
+  loadingDiv.style.display = 'block';
+
+  fetch('/apps/public', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ customerId: customerId, userValue: inputField.value })
+  })
+  .then(res => res.json())
+  .then(data => {
+    if (data.success) {
+      fetch(`/discount/${data.discountTitle}`).then(() => {
+        fetch('/cart/update.js', { 
+          method: 'POST', 
+          headers: { 'Content-Type': 'application/json' }, 
+          body: JSON.stringify({ updates: {} }) 
+        })
+        .then(() => fetch('/cart.js'))
+        .then(res => res.json())
+        .then(cart => {
+          const updatedTotalValue = (cart.total_price / 100).toFixed(2);
+          const discountAmt = (cart.total_discount / 100).toFixed(2);
+          
+          document.querySelectorAll('.minicart__bottom .minicart__total .jsPrice').forEach(el => {
+            el.innerText = `Rs. ${updatedTotalValue}`;
+          });
+
+          insertDiscountLabel(data.discountTitle, discountAmt);
+          document.dispatchEvent(new CustomEvent('cart:refresh')); 
+          
+          isRedeeming = false;
+          loadingDiv.style.display = 'none';
+          
+          document.querySelectorAll('.injected-loyalty-app').forEach(app => {
+            app.querySelector('.active_reward_display').style.display = 'block';
+            app.querySelector('.redeem_action_area').style.display = 'none';
+            fetchCustomerPoints(app);
+          });
+        });
+      });
+    } else {
+      throw new Error(data.message);
+    }
+  })
+  .catch(err => {
+    isRedeeming = false;
+    loadingDiv.style.display = 'none';
+    actionArea.style.display = 'block';
+    alert(err.message || "Error redeeming points.");
+  });
+}
+
+function insertDiscountLabel(couponCode, discountValue) {
+  document.querySelectorAll('.minicart__bottom').forEach(footer => {
+    if (!footer.querySelector('.loyalty-discount-tag')) {
+      const html = `<div class="loyalty-discount-tag" style="display:flex; justify-content:space-between; border:1px solid #dfe6e9; padding:8px; border-radius:4px; margin-bottom:10px; background:#fff; font-size:13px;">
+                      <span>🏷️ ${couponCode}</span>
+                      <span style="color:#d63384;">(-Rs. ${discountValue})</span>
+                    </div>`;
+      footer.insertAdjacentHTML('afterbegin', html);
+    }
+  });
+}
+
+function fetchCustomerPoints(wrapper) {
+  const customerId = wrapper.querySelector('.proxy-app-container').getAttribute('data-customer-id');
+  fetch(`/apps/public?customerId=${customerId}`).then(res => res.json()).then(data => {
+    if (data.success) {
+      wrapper.querySelector('.points_balance_display').innerText = data.pointValue;
+      wrapper.querySelector('.user_input_value').setAttribute('data-max-points', data.pointValue);
+    }
+  });
+}
+
+function checkCartState(wrapper) {
+  if (isRedeeming) return;
+  fetch('/cart.js').then(res => res.json()).then(cart => {
+    if (cart.item_count === 0) {
+      wrapper.style.display = 'none';
+      return;
+    } else {
+      wrapper.style.display = 'block';
+    }
+    const hasDiscount = cart.cart_level_discount_applications.length > 0;
+    wrapper.querySelector('.redeem_action_area').style.display = hasDiscount ? 'none' : 'block';
+    wrapper.querySelector('.active_reward_display').style.display = hasDiscount ? 'block' : 'none';
+    if (hasDiscount) {
+      insertDiscountLabel(cart.cart_level_discount_applications[0].title, (cart.total_discount / 100).toFixed(2));
+    }
+  });
+}
+</script>
+
+{% schema %}
+{
+  "name": "Reward Point Drawer",
+  "target": "body",
+  "settings": [
+    { "type": "color", "id": "button_bg_color", "label": "Redeem Button Color", "default": "#d63384" },
+    { "type": "color", "id": "button_text_color", "label": "Button Text Color", "default": "#ffffff" }
+  ]
+}
+{% endschema %}

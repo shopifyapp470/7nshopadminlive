@@ -1,0 +1,115 @@
+{% schema %}
+{
+  "name": "Survey Tracker",
+  "target": "body",
+  "settings": []
+}
+{% endschema %}
+
+<script>
+(function() {
+    document.addEventListener('DOMContentLoaded', function() {
+        const urlParams = new URLSearchParams(window.location.search);
+        const senderEmail = urlParams.get('utm_source');
+        const surveyTitle = urlParams.get('survey_title'); //
+        const path = window.location.pathname;
+
+        if (senderEmail && path.includes('/pages/')) {
+            const receiverEmail = "{{ customer.email | default: 'guest' }}";
+            const handle = path.split('/').pop(); 
+
+            fetch('/apps/public/survey-view-track', { 
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    handle: handle,
+                    senderEmail: senderEmail,
+                    receiverEmail: receiverEmail,
+                    title: surveyTitle
+                })
+            })
+            .then(res => res.json())
+            .then(resData => {
+                if(resData.success) console.log("View tracked for:", resData.title);
+            })
+            .catch(err => console.error("Tracking failed:", err));
+        }
+    });
+})();
+</script>
+
+<script>
+(function() {
+    document.addEventListener('DOMContentLoaded', function() {
+        const urlParams = new URLSearchParams(window.location.search);
+        const senderEmail = urlParams.get('utm_source');
+        const assetTitle = urlParams.get('title');
+
+        if (senderEmail && assetTitle) {
+            const receiverEmail = "{{ customer.email | default: 'guest' }}";
+            const handle = window.location.pathname.split('/').pop(); 
+            
+            const sessionKey = `viewed_${encodeURIComponent(assetTitle)}`;
+            if (sessionStorage.getItem(sessionKey)) return;
+
+            fetch('/apps/public/digital-hub-view', { 
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    linkName: assetTitle,
+                    senderEmail: senderEmail,
+                    receiverEmail: receiverEmail,
+                    shop: window.location.hostname
+                })
+            })
+            .then(res => res.json())
+            .then(data => {
+                if(data.success) {
+                    sessionStorage.setItem(sessionKey, 'true');
+                    console.log("View tracked for: " + assetTitle);
+                }
+            })
+            .catch(err => console.error("Tracking Error:", err));
+        }
+    });
+})();
+</script>
+<script>
+  (function() {
+    const urlParams = new URLSearchParams(window.location.search);
+    const ref = urlParams.get('ref');
+
+    if (ref) {
+      localStorage.setItem('pending_referral', ref);
+    }
+
+    {% if customer %}
+      const pendingRef = localStorage.getItem('pending_referral');
+      const currentCustomerEmail = "{{ customer.email }}";
+
+      if (pendingRef && pendingRef !== currentCustomerEmail) {
+        fetch('/apps/public/process-referral', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            newCustomerEmail: currentCustomerEmail,
+            newCustomerId: "{{ customer.id }}",
+            referredByEmail: pendingRef,
+            store: window.location.hostname
+          })
+        })
+        .then(res => res.json())
+        .then(data => {
+          localStorage.removeItem('pending_referral');
+          
+          if(data.success) {
+            console.log("Referral processed: Points awarded to sender.");
+          } else {
+            console.log("Referral notice:", data.message);
+          }
+        })
+        .catch(err => console.error("Referral Error:", err));
+      }
+    {% endif %}
+  })();
+</script>

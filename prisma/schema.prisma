@@ -1,0 +1,181 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+// Note that some adapters may set a maximum length for the String type by default, please ensure your strings are long
+// enough when changing adapters.
+// See https://www.prisma.io/docs/orm/reference/prisma-schema-reference#string for more information
+
+datasource db {
+  provider = "mongodb"
+  url      = env("DATABASE_URL")
+}
+
+model Session {
+  id            String    @id @map("_id")
+  shop          String
+  state         String
+  isOnline      Boolean   @default(false)
+  scope         String?
+  expires       DateTime?
+  accessToken   String
+  userId        BigInt?
+  firstName     String?
+  lastName      String?
+  email         String?
+  accountOwner  Boolean   @default(false)
+  locale        String?
+  collaborator  Boolean?  @default(false)
+  emailVerified Boolean?  @default(false)
+  refreshToken        String?
+  refreshTokenExpires DateTime?
+}
+
+
+model RewardPoint {
+  id                        String         @id @default(auto()) @map("_id") @db.ObjectId
+  customerId                String         @unique
+  customerEmail             String
+  pointValue                Float            @default(0)
+  pendingPoint              Float            @default(0)
+  activePoint               Float            @default(0)
+  store                     String
+  referredBy                String?        // ID of the referrer
+  referralCount             Int            @default(0)
+  referralPoint             Int            @default(0)
+  firstOrderDone            Boolean        @default(false)
+  dob                       DateTime?
+  anniversaryDate           DateTime?
+  lastBirthdayRewardYear    Int?
+  lastAnniversaryRewardYear Int?
+  birthdayPoint             Int            @default(0)
+  anniversaryPoint          Int            @default(0)
+  createdAt                 DateTime       @default(now())
+  updatedAt                 DateTime       @updatedAt
+  orders                    OrderHistory[]
+}
+
+model OrderHistory {
+  id              String      @id @default(auto()) @map("_id") @db.ObjectId
+  orderId         String      @unique
+  orderNumber     String?
+  status          String      @default("PENDING")
+  discountAmount  Float       @default(0.0)
+  couponCode      String?
+  pointsEarned    Float       @default(0.0)   
+  pointsRedeemed  Float       @default(0.0) 
+  pointsRevert    Float       @default(0)
+  highRewardPoint Int         @default(0)
+  subtotal        Float       @default(0.0)
+  productNames    String?
+  createdAt       DateTime    @default(now())
+  rewardPointId   String?      @db.ObjectId
+  rewardPoint     RewardPoint? @relation(fields: [rewardPointId], references: [id], onDelete: Cascade)
+
+}
+
+model UserSetting {
+  id               String   @id @default(auto()) @map("_id") @db.ObjectId
+  shop             String   @unique
+  birthdayPoint    Int      @default(10)
+  anniversaryPoint Int      @default(5)
+  earnPercentage   Int      @default(1)
+  redeemPercentage Int      @default(10)
+  referralPoint    Int      @default(10)
+  minOrderTotal    Float    @default(0)
+  fixedRewardPoint Int      @default(0)
+  rewardDelay       String?   @default("120000")
+  createdAt        DateTime   @default(now())
+  updatedAt        DateTime    @updatedAt
+}
+model CleverTapConfig {
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  shop      String   @unique
+  accountId String
+  passcode  String
+  walletId  String
+  region    String   @default("in1")
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+model ReferralTracking {
+  id         String   @id @default(auto()) @map("_id") @db.ObjectId
+  referrerId String
+  shop       String
+  createdAt  DateTime @default(now())
+}
+model DownloadLog {
+  id             String   @id @default(auto()) @map("_id") @db.ObjectId
+  employeeEmail  String
+  assetId        String
+  assetName      String
+  downloadCount  Int      @default(0)
+  lastDownloaded DateTime @updatedAt
+  createdAt      DateTime @default(now())
+  @@unique([employeeEmail, assetId])
+}
+
+model DigitalHubLink {
+  id          String           @id @default(auto()) @map("_id") @db.ObjectId
+  name        String
+  url         String
+  description String?
+  category    String?
+  tag         String?
+  dateAdded   DateTime         @default(now())
+  download    Boolean          @default(false)
+  downloadUrl String?
+  shop        String
+  views       DigitalHubView[]
+}
+model DigitalHubView {
+  id            String          @id @default(auto()) @map("_id") @db.ObjectId
+  linkId        String          @db.ObjectId
+  digitalLink   DigitalHubLink? @relation(fields: [linkId], references: [id], onDelete: Cascade)
+  name          String
+  senderEmail   String
+  receiverEmail String
+  shop          String
+  count         Int             @default(1)
+  createdAt     DateTime        @default(now())
+  updatedAt     DateTime?        @updatedAt
+  @@unique([linkId, senderEmail, receiverEmail])
+}
+model FAQ {
+  id          String   @id @default(auto()) @map("_id") @db.ObjectId
+  question    String
+  answer      String
+  category    String?
+  tag         String?
+  shop        String
+  displayDate DateTime @default(now())
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+model Survey {
+  id            String           @id @default(auto()) @map("_id") @db.ObjectId
+  title         String
+  link          String
+  status        String           @default("ACTIVE")
+  views          Int              @default(0)
+  shop          String
+  createdAt     DateTime         @default(now())
+  updatedAt     DateTime?        @updatedAt
+  responses SurveyResponse[]
+}
+
+model SurveyResponse {
+  id            String   @id @default(auto()) @map("_id") @db.ObjectId
+  surveyId      String   @db.ObjectId
+  survey        Survey   @relation(fields: [surveyId], references: [id], onDelete: Cascade)
+  title         String
+  senderEmail   String
+  receiverEmail String
+  count         Int      @default(1)
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime? @updatedAt
+}
